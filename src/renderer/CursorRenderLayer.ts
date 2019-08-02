@@ -148,7 +148,13 @@ export class CursorRenderLayer extends BaseRenderLayer {
       this._clearCursor();
       this._ctx.save();
       this._ctx.fillStyle = this._colors.cursor.css;
-      this._renderBlurCursor(this._bufferService.buffer.x, viewportRelativeCursorY, this._cell);
+
+      if(this._optionsService.options.cursorBlink == true) {
+        this._getCursorFromOption()(this._bufferService.buffer.x, viewportRelativeCursorY, this._cell);
+      } else {
+        this._renderBlurCursor(this._bufferService.buffer.x, viewportRelativeCursorY, this._cell);
+      }
+
       this._ctx.restore();
       this._state.x = this._bufferService.buffer.x;
       this._state.y = viewportRelativeCursorY;
@@ -177,7 +183,7 @@ export class CursorRenderLayer extends BaseRenderLayer {
     }
 
     this._ctx.save();
-    this._cursorRenderers[this._optionsService.options.cursorStyle || 'block'](this._bufferService.buffer.x, viewportRelativeCursorY, this._cell);
+    this._getCursorFromOption()(this._bufferService.buffer.x, viewportRelativeCursorY, this._cell);
     this._ctx.restore();
 
     this._state.x = this._bufferService.buffer.x;
@@ -198,6 +204,10 @@ export class CursorRenderLayer extends BaseRenderLayer {
         width: null
       };
     }
+  }
+
+  private _getCursorFromOption(): any {
+    return this._cursorRenderers[this._optionsService.options.cursorStyle || 'block'];
   }
 
   private _renderBarCursor(x: number, y: number, cell: ICellData): void {
